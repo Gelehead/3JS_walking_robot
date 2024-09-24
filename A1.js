@@ -76,30 +76,65 @@ class Robot {
     this.armsLength = 0.5;
     this.armsRadius = 0.2;
 
+    // Placement 
+    this.mainBodyPos = [0,4,0];
+    var m = this.mainBodyPos;
+
+    var p = [];
+
     // limbs
-
-
 
     // Head
     var headGeometry = new THREE.CubeGeometry(2*this.headRadius, this.headRadius, this.headRadius);
-    this.head = new utils.Limb(this.torso, [], [0,2,0], ["x","y","z"], headGeometry, "head");    
+    p = [m[0] + 0, m[1] + 1.3, m[2] + 0];
+    this.head = new utils.Limb(this.torso, [], p, ["x","y","z"], headGeometry, "head");    
+
+    // hands
+    var handsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+    p = [m[0] + 1, m[1] - 1, m[2] + 0];
+    this.Lhand = new utils.Limb(this.LFarm, [], p, ["x","y","z"], handsGeometry, "LHand");
+    p = [m[0] - 1, m[1] - 1, m[2] + 0];
+    this.Rhand = new utils.Limb(this.RFarm, [], p, ["x","y","z"], handsGeometry, "RHand");
+
+    // forearms
+    var farmsGeometry = new THREE.SphereGeometry(0.20, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+    p = [m[0] + 1, m[1] - 0.5, m[2] + 0];
+    this.LFarm = new utils.Limb(this.Larm, [this.Lhand], p, ["x","y","z"], farmsGeometry, "LFarm");
+    p = [m[0] - 1, m[1] - 0.5, m[2] + 0];
+    this.RFarm = new utils.Limb(this.Rarm, [this.Rhand], p, ["x","y","z"], farmsGeometry, "RFarm");
 
     // Arms
     var armsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    this.Larm = new utils.Limb(this.torso, [], [1,0,0], ["x","y","z"], armsGeometry, "Larm");
-    this.Rarm = new utils.Limb(this.torso, [], [-1,0,0], ["x","y","z"], armsGeometry, "Rarm");
+    p = [m[0] + 1, m[1] + 0.3, m[2] + 0];
+    this.Larm = new utils.Limb(this.torso, [this.LFarm], p, ["x","y","z"], armsGeometry, "Larm");
+    p = [m[0] - 1, m[1] + 0.3, m[2] + 0];
+    this.Rarm = new utils.Limb(this.torso, [this.RFarm], p, ["x","y","z"], armsGeometry, "Rarm");
 
-    this.Larm.matrix = utils.rescaleMat(this.Larm.matrix, 1, 2, 1);
-    this.Larm.self.setMatrix(this.Larm.matrix);
+    // ----------------------------------- Lower Body -----------------------------------
+    // feet
+    var feetGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+    p = [m[0] + 0.4, m[1] - 3.7, m[2] + 0];
+    this.Lfoot = new utils.Limb(this.LFleg, [], p, ["x","y","z"], feetGeometry, "Lfeet");
+    p = [m[0] - 0.4 , m[1] - 3.7, m[2] + 0];
+    this.Rfoot = new utils.Limb(this.RFleg, [], p, ["x","y","z"], feetGeometry, "Rfeet");
 
+    //forelegs :)
+    var flegsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+    p = [m[0] + 0.4, m[1] - 2.7, m[2] + 0];
+    this.LFleg = new utils.Limb(this.Lleg, [this.Lfoot], p, ["x","y","z"], flegsGeometry, "LFleg");
+    p = [m[0] - 0.4, m[1] - 2.7, m[2] + 0];
+    this.RFleg = new utils.Limb(this.Lleg, [this.Rfoot], p, ["x","y","z"], flegsGeometry, "RFleg");
 
-    // Apply scaling to the right arm
-    this.Rarm.matrix = utils.rescaleMat(this.Rarm.matrix, 1, 2, 1);
-    this.Rarm.self.setMatrix(this.Rarm.matrix);
+    //legs
+    var legsGeometry = new THREE.SphereGeometry(0.30, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
+    p = [m[0] + 0.4, m[1] - 1.3, m[2] + 0];
+    this.Lleg = new utils.Limb(this.torso, [this.LFleg], p, ["x","y","z"], legsGeometry, "Lleg");
+    p = [m[0] - 0.4, m[1] - 1.3, m[2] + 0];
+    this.Rleg = new utils.Limb(this.torso, [this.RFleg], p, ["x","y","z"], legsGeometry, "Rleg");
 
     // torso 
     let torsoGeometry = new THREE.CubeGeometry(2*this.torsoRadius, this.torsoHeight, this.torsoRadius, 64);
-    this.torso = new utils.Limb(null, [this.head, this.Larm, this.Rarm], [0, this.torsoHeight/ 2,0], ["x","y","z"], torsoGeometry, "torso");
+    this.torso = new utils.Limb(null, [this.head, this.Larm, this.Rarm, this.Lleg, this.Rleg], m, ["x","y","z"], torsoGeometry, "torso");
 
 
     // Add parameters for parts
@@ -119,8 +154,26 @@ class Robot {
 	// Add robot to scene
 	scene.add(this.torso.self);
     scene.add(this.head.self);
+
+    // Larm
     scene.add(this.Larm.self);
+      scene.add(this.LFarm.self);
+        scene.add(this.Lhand.self);
+
+    // Rarm
     scene.add(this.Rarm.self);
+      scene.add(this.RFarm.self);
+        scene.add(this.Rhand.self);
+
+    //Rleg
+    scene.add(this.Rleg.self);
+      scene.add(this.RFleg.self);
+        scene.add(this.Rfoot.self);
+
+    //Lleg
+    scene.add(this.Lleg.self);
+      scene.add(this.LFleg.self);
+        scene.add(this.Lfoot.self);
     
     // Add parts
     // TODO
@@ -225,7 +278,7 @@ function checkKeyboard() {
 
   // LEFT
   if (keyboard.pressed("a")){
-    var rotation_speed = 0.1;
+    var rotation_speed = 0.05;
     switch (components[selectedRobotComponent]){
       case "Torso":
         robot.torso.rotate(rotation_speed, "y");
@@ -240,7 +293,7 @@ function checkKeyboard() {
 
   // RIGHT
   if (keyboard.pressed("d")){
-    var rotation_speed = 0.1;
+    var rotation_speed = 0.05;
     switch (components[selectedRobotComponent]){
       case "Torso":
         robot.torso.rotate(-rotation_speed, "y");

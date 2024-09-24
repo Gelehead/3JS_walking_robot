@@ -28,7 +28,7 @@ export class Limb {
         if (this.dof.includes(axis)){
             var m = this.matrix;
 
-            this.matrix = this.parent == null ? idMat4() : multMat(this.parent.matrix, this.matrix);
+            this.matrix = idMat4();
             this.matrix = rotateMat(this.matrix, angle, axis);
             this.matrix = multMat(m, this.matrix);
 
@@ -37,10 +37,7 @@ export class Limb {
 
             this.walkDirection = rotateVec3(this.walkDirection, angle, axis);
 
-            for (let c of this.children){
-                var temp = multMat(c.matrix, c.initialMatrix);
-                c.self.setMatrix(multMat(m0, temp));
-            }
+            this.apply_to_children(m0);
         } else {
             window.alert("could not rotate " + this.name + " along the " + axis + " axis, ilegal move");
         }
@@ -50,27 +47,36 @@ export class Limb {
         this.matrix = translateMat(this.matrix, speed * this.walkDirection.x, speed * this.walkDirection.y, speed * this.walkDirection.z);
         var m0 = multMat(this.matrix, this.initialMatrix);
         this.self.setMatrix(m0);
+        this.apply_to_children(m0);
+    }
 
+    apply_to_children(matrix){
         for (let c of this.children){
             var temp = multMat(c.matrix, c.initialMatrix);
-            c.self.setMatrix(multMat(m0, temp));
+            c.self.setMatrix(multMat(matrix, temp));
+            if (this.children.length != 0){
+                c.apply_to_children(matrix);
+            }
         }
     }
 
     // p0 is the initial position
     initialize_limb(p0){
-        this.initialMatrix = translateMat(idMat4(), p0[0], p0[1], p0[2]);
-        this.matrix = idMat4();
-        if (this.name.includes("arm")){
-            this.matrix = rescaleMat(this.matrix, 1, 1.5, 1);
-            this.self.setMatrix(this.matrix);
-        }
+        this.initialMatrix = idMat4();
 
-        if (this.parent != null){
-            this.self.setMatrix(multMat(this.parent.initialMatrix, this.initialMatrix));
-        } else {
+        if (this.name.includes("arm") || this.name.includes("leg")){
+            this.initialMatrix = rescaleMat(this.initialMatrix, 1, 2, 1);
             this.self.setMatrix(this.initialMatrix);
         }
+        if (this.name.includes("leg")){
+            this.initialMatrix = rescaleMat(this.initialMatrix, 1.2, 1.5, 1);
+            this.self.setMatrix(this.initialMatrix);
+        }
+
+        this.initialMatrix = translateMat(this.initialMatrix, p0[0], p0[1], p0[2]);
+        this.matrix = idMat4();
+
+        this.self.setMatrix(this.initialMatrix);
         console.log(this.name, this.matrix);
     }
 }
