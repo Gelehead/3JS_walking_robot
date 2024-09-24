@@ -1,6 +1,8 @@
 # IFT3355-walking_robot
- walk animation and more
+    Done in the contet of the IFT 3355 course at UdeM, this project aims to make a 3d robot and make it move ~from scratch with rotation and translation matrix.
+    
+    Have to make walk animation and more.
 
 
 ## problems encountered
- - testing and output in js: `console.log()` didn't work for me so i had to resort to `window.alert()` 
+ - torso in the right position but whole body flying torso.y + 2 over it

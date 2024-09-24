@@ -37,7 +37,11 @@ export class Limb {
 
             this.walkDirection = rotateVec3(this.walkDirection, angle, axis);
 
-            this.apply_to_children(m0);
+            //this.apply_to_children(m0);
+
+            for (let c of this.children){
+                c.rotate(angle, axis);
+            }
         } else {
             window.alert("could not rotate " + this.name + " along the " + axis + " axis, ilegal move");
         }
@@ -47,7 +51,10 @@ export class Limb {
         this.matrix = translateMat(this.matrix, speed * this.walkDirection.x, speed * this.walkDirection.y, speed * this.walkDirection.z);
         var m0 = multMat(this.matrix, this.initialMatrix);
         this.self.setMatrix(m0);
-        this.apply_to_children(m0);
+        
+        for (let c of this.children){
+            c.move(speed);
+        }
     }
 
     apply_to_children(matrix){
