@@ -81,60 +81,61 @@ class Robot {
     var m = this.mainBodyPos;
 
     var p = [];
+    
 
     // limbs
 
     // Head
     var headGeometry = new THREE.CubeGeometry(2*this.headRadius, this.headRadius, this.headRadius);
-    p = [m[0] + 0, m[1] + 1.3, m[2] + 0];
-    this.head = new utils.Limb(this.torso, [], p, ["x","y","z"], headGeometry, "head");    
+    p = [0,1.25,0];
+    this.head = new utils.Limb(this.torso, [], p, ["x","y","z"], headGeometry, "Head");    
 
     // hands
     var handsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 1, m[1] - 1, m[2] + 0];
+    p = [1,-2,0];
     this.Lhand = new utils.Limb(this.LFarm, [], p, ["x","y","z"], handsGeometry, "LHand");
-    p = [m[0] - 1, m[1] - 1, m[2] + 0];
+    p = [-1,-2,0];
     this.Rhand = new utils.Limb(this.RFarm, [], p, ["x","y","z"], handsGeometry, "RHand");
 
     // forearms
     var farmsGeometry = new THREE.SphereGeometry(0.20, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 1, m[1] - 0.5, m[2] + 0];
+    p = [1,-1,0];
     this.LFarm = new utils.Limb(this.Larm, [this.Lhand], p, ["x","y","z"], farmsGeometry, "LFarm");
-    p = [m[0] - 1, m[1] - 0.5, m[2] + 0];
+    p = [-1,-1,0];
     this.RFarm = new utils.Limb(this.Rarm, [this.Rhand], p, ["x","y","z"], farmsGeometry, "RFarm");
 
     // Arms
     var armsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 1, m[1] + 0.3, m[2] + 0];
+    p = [1,0,0];
     this.Larm = new utils.Limb(this.torso, [this.LFarm], p, ["x","y","z"], armsGeometry, "Larm");
-    p = [m[0] - 1, m[1] + 0.3, m[2] + 0];
+    p = [-1,0,0];
     this.Rarm = new utils.Limb(this.torso, [this.RFarm], p, ["x","y","z"], armsGeometry, "Rarm");
 
     // ----------------------------------- Lower Body -----------------------------------
     // feet
     var feetGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 0.4, m[1] - 3.7, m[2] + 0];
+    p = [0.4,-3.8,0];
     this.Lfoot = new utils.Limb(this.LFleg, [], p, ["x","y","z"], feetGeometry, "Lfeet");
-    p = [m[0] - 0.4 , m[1] - 3.7, m[2] + 0];
+    p = [-0.4,-3.8,0];
     this.Rfoot = new utils.Limb(this.RFleg, [], p, ["x","y","z"], feetGeometry, "Rfeet");
 
     //forelegs :)
     var flegsGeometry = new THREE.SphereGeometry(0.25, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 0.4, m[1] - 2.7, m[2] + 0];
+    p = [0.4,-3,0];
     this.LFleg = new utils.Limb(this.Lleg, [this.Lfoot], p, ["x","y","z"], flegsGeometry, "LFleg");
-    p = [m[0] - 0.4, m[1] - 2.7, m[2] + 0];
+    p = [-0.4,-3,0];
     this.RFleg = new utils.Limb(this.Lleg, [this.Rfoot], p, ["x","y","z"], flegsGeometry, "RFleg");
 
     //legs
     var legsGeometry = new THREE.SphereGeometry(0.30, 50, 50, 0, Math.PI * 2, 0, Math.PI * 2);
-    p = [m[0] + 0.4, m[1] - 1.3, m[2] + 0];
+    p = [0.4,-1.5,0];
     this.Lleg = new utils.Limb(this.torso, [this.LFleg], p, ["x","y","z"], legsGeometry, "Lleg");
-    p = [m[0] - 0.4, m[1] - 1.3, m[2] + 0];
+    p = [-0.4, -1.5, 0];
     this.Rleg = new utils.Limb(this.torso, [this.RFleg], p, ["x","y","z"], legsGeometry, "Rleg");
 
     // torso 
     let torsoGeometry = new THREE.CubeGeometry(2*this.torsoRadius, this.torsoHeight, this.torsoRadius, 64);
-    this.torso = new utils.Limb(null, [this.head, this.Larm, this.Rarm, this.Lleg, this.Rleg], m, ["x","y","z"], torsoGeometry, "torso");
+    this.torso = new utils.Limb(null, [this.head, this.Larm, this.Rarm, this.Lleg, this.Rleg], m, ["x","y","z"], torsoGeometry, "Torso");
 
 
     // Add parameters for parts
@@ -194,6 +195,13 @@ var robot = new Robot();
 var keyboard = new THREEx.KeyboardState();
 
 var selectedRobotComponent = 0;
+var limbs = [
+  robot.torso , robot.head, 
+  robot.Larm, robot.LFarm, robot.Lhand,
+  robot.Rarm, robot.RFarm, robot.Rhand,
+  robot.Lleg, robot.LFleg, robot.Lfoot,
+  robot.Rleg, robot.RFleg, robot.Rfoot
+]
 var components = [
   "Torso",
   "Head",
@@ -244,19 +252,40 @@ function checkKeyboard() {
     window.alert(components[selectedRobotComponent] + " selected");
   }
 
+  if (keyboard.pressed("u")){
+    robot.Larm.anchor_rotate(0.1, "x");
+  }
+
+  if (keyboard.pressed("j")){
+    robot.Larm.anchor_rotate(-0.1, "x");
+  }
+
   // UP
+  // could be generalized with smth like limbs.find(name, component[selectedComponent])
   if (keyboard.pressed("w")){
     switch (components[selectedRobotComponent]){
       case "Torso":
         robot.torso.move(0.1);
         break;
       case "Head":
+        robot.head.rotate(0.1, "x")
         break;
       case "Larm" :
         robot.Larm.rotate(0.1, "x");
         break
+      case "Lfarm" :
+        robot.LFarm.rotate(0.1, "x")
+        break
       case "Rarm" :
-        robot.Rarm.rotate(0.1, "z")
+        robot.Rarm.rotate(0.1, "x")
+        break
+      case "Lleg" :
+        robot.Lleg.rotate(0.1, "x")
+        break
+      case "Rleg" : 
+        robot.Rleg.rotate(0.1, "x")
+        break
+      case "":
         break
       // Add more cases
       // TODO
@@ -269,8 +298,26 @@ function checkKeyboard() {
       case "Torso":
         robot.torso.move(-0.1);
         break;
-      case "Head":
-        break;
+        case "Head":
+          robot.head.rotate(-0.1, "x")
+          break;
+        case "Larm" :
+          robot.Larm.rotate(-0.1, "x");
+          break
+        case "Lfarm" :
+          robot.LFarm.rotate(-0.1, "x")
+          break
+        case "Rarm" :
+          robot.Rarm.rotate(-0.1, "x")
+          break
+        case "Lleg" :
+          robot.Lleg.rotate(-0.1, "x")
+          break
+        case "Rleg" : 
+          robot.Rleg.rotate(-0.1, "x")
+          break
+        case "":
+          break
       // Add more cases
       // TODO
     }
@@ -283,9 +330,26 @@ function checkKeyboard() {
       case "Torso":
         robot.torso.rotate(rotation_speed, "y");
         break;
-      case "Head":
-        robot.head.rotate(rotation_speed, "y");
-        break;
+        case "Head":
+          robot.head.rotate(0.1, "y")
+          break;
+        case "Larm" :
+          robot.Larm.rotate(0.1, "y");
+          break
+        case "Lfarm" :
+          robot.LFarm.rotate(0.1, "y")
+          break
+        case "Rarm" :
+          robot.Rarm.rotate(0.1, "y")
+          break
+        case "Lleg" :
+          robot.Lleg.rotate(0.1, "y")
+          break
+        case "Rleg" : 
+          robot.Rleg.rotate(0.1, "y")
+          break
+        case "":
+          break
       // Add more cases
       // TODO
     }
@@ -298,9 +362,26 @@ function checkKeyboard() {
       case "Torso":
         robot.torso.rotate(-rotation_speed, "y");
         break;
-      case "Head":
-        robot.head.rotate(-rotation_speed);
-        break;
+        case "Head":
+          robot.head.rotate(-0.1, "y")
+          break;
+        case "Larm" :
+          robot.Larm.rotate(-0.1, "");
+          break
+        case "Lfarm" :
+          robot.LFarm.rotate(-0.1, "y")
+          break
+        case "Rarm" :
+          robot.Rarm.rotate(-0.1, "y")
+          break
+        case "Lleg" :
+          robot.Lleg.rotate(-0.1, "y")
+          break
+        case "Rleg" : 
+          robot.Rleg.rotate(-0.1, "y")
+          break
+        case "":
+          break
       // Add more cases
       // TODO
     }

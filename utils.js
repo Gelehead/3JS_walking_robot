@@ -37,14 +37,38 @@ export class Limb {
 
             this.walkDirection = rotateVec3(this.walkDirection, angle, axis);
 
-            //this.apply_to_children(m0);
+            this.apply_to_children(m0);
 
-            for (let c of this.children){
-                c.rotate(angle, axis);
-            }
+            //for (let c of this.children){
+            //    c.rotate(angle, axis);
+            //}
         } else {
             window.alert("could not rotate " + this.name + " along the " + axis + " axis, ilegal move");
         }
+    }
+
+    // returns [x,y,z] of actual limb
+    get_anchor(){
+        var a = this.matrix.elements;
+        return [a[12], a[13], a[14]];
+    }
+    // returns [cosx, cosy, cosz]
+    get_angles(){
+        let m = this.matrix.elements;
+        return [m[0], m[4], m[8]];
+    }
+
+    /**anchor parameter is a point3 vector at which post rotation matrix will be translated
+     * 
+     * @param {*} angle 
+     * @param {*} axis 
+     */
+    anchor_rotate(angle, axis){
+        var a = this.get_anchor();
+        var t = this.get_angles();
+        var m = rotateMat(this.initialMatrix, angle, axis);
+        m = translateMat(m, a[0], a[1], a[2])
+        this.self.setMatrix(m);
     }
 
     move(speed){
@@ -52,22 +76,26 @@ export class Limb {
         var m0 = multMat(this.matrix, this.initialMatrix);
         this.self.setMatrix(m0);
         
-        for (let c of this.children){
-            c.move(speed);
-        }
+        //for (let c of this.children){
+        //    c.move(speed);
+        //}
+        this.apply_to_children(m0);
     }
 
+    /**
+     * Useless 
+     * @param {*} matrix translation or rotation matrix to pass to children
+     */
     apply_to_children(matrix){
         for (let c of this.children){
-            var temp = multMat(c.matrix, c.initialMatrix);
-            c.self.setMatrix(multMat(matrix, temp));
-            if (this.children.length != 0){
-                c.apply_to_children(matrix);
-            }
+            let m = multMat(matrix, c.initialMatrix);
+            c.matrix = m;
+            c.self.setMatrix(m);
+            c.apply_to_children(matrix);
         }
     }
 
-    // p0 is the initial position
+    // p0 is the intended initial position of the limb
     initialize_limb(p0){
         this.initialMatrix = idMat4();
 
@@ -84,7 +112,8 @@ export class Limb {
         this.matrix = idMat4();
 
         this.self.setMatrix(this.initialMatrix);
-        console.log(this.name, this.matrix);
+        this.apply_to_children(this.initialMatrix);
+        
     }
 }
 
@@ -104,6 +133,17 @@ export function idMat4() {
       0, 1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1
+    );
+    return m;
+}
+
+export function negIdMat4() {
+    var m = new THREE.Matrix4();
+    m.set(
+        -1, 0, 0, 0,
+        0, -1, 0, 0,
+        0, 0, -1, 0,
+        0, 0, 0, 1
     );
     return m;
 }
