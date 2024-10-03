@@ -118,10 +118,7 @@ export class Limb {
         var final_matrix;
 
         //transformations
-        //m = multMat(papa.matrix, papa.initialMatrix);
-
         m = this.root_transformation();
-        //m = multMat(m, this.matrix);
         a = this.get_anchor(m);
 
         this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
