@@ -42,7 +42,7 @@ export class Limb {
         }
     }
 
-    
+
     rotateArm(angle, axis, torso, farm, hand){
         var m = idMat4();
         var a;
@@ -110,7 +110,7 @@ export class Limb {
      * @param {*} axis 
      * @param {*} papa is the father's matrix (see README.md)
      */
-    anchor_rotate(angle, axis, papa){ 
+    anchor_rotate(angle, axis){ 
 
         // initialisation
         var m = idMat4();
@@ -121,7 +121,7 @@ export class Limb {
         //m = multMat(papa.matrix, papa.initialMatrix);
 
         m = this.root_transformation();
-        m = multMat(m, this.matrix);
+        //m = multMat(m, this.matrix);
         a = this.get_anchor(m);
 
         this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
@@ -173,14 +173,6 @@ export class Limb {
             let m = multMat(matrix, c.matrix);
             c.self.setMatrix(multMat(m, c.initialMatrix));
             c.apply_to_children(m)
-        }
-    }
-
-    apply_to_children1(){
-        for (let c of this.children){
-            let m = multMat(c.matrix, this.getAllTransformations(this));
-            m = multMat(c.matrix, m);
-            c.self.setMatrix(m);
         }
     }
 
