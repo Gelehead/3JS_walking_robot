@@ -64,11 +64,10 @@ export class Limb {
         this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
         
         final_matrix = multMat(m, this.matrix);
+        
         m = multMat(m, this.initialMatrix);
         //application
-        this.self.setMatrix(multMat(m, this.matrix));
-
-        // transmission
+        this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
         this.apply_to_children(final_matrix);
     }
 
@@ -98,9 +97,9 @@ export class Limb {
 
     apply_to_children(matrix){
         for (let c of this.children){
-            let m = multMat(matrix, c.initialMatrix);
-            c.self.setMatrix(m);
-            c.apply_to_children(matrix);
+            let m = multMat(matrix, c.matrix);
+            c.self.setMatrix(multMat(m, c.initialMatrix));
+            c.apply_to_children(m)
         }
     }
 

@@ -16,7 +16,7 @@ document.body.appendChild(renderer.domElement);
 
 // SETUP CAMERA
 var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000); // view angle, aspect ratio, near, far
-camera.position.set(10,5,10);
+camera.position.set(10,15,15);
 camera.lookAt(scene.position);
 scene.add(camera);
 
