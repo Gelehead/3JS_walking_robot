@@ -57,15 +57,17 @@ export class Limb {
 
         //transformations
         m = multMat(papa.matrix, papa.initialMatrix);
+
+        //m = this.getAllTransformations(this.previous);
         m = multMat(m, this.matrix);
         a = this.get_anchor(m);
+
         this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
         this.matrix = rotateMat(this.matrix, angle, axis);
         this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
         
         final_matrix = multMat(m, this.matrix);
-        
-        m = multMat(m, this.initialMatrix);
+
         //application
         this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
         this.apply_to_children(final_matrix);
@@ -89,9 +91,9 @@ export class Limb {
     getAllTransformations(previous_limb){
         // get previous if existing
         if (previous_limb != null){
-            return multMat(previous_limb.matrix, this.previous_limb.getAllTransformations(previous_limb.previous));
+            return multMat(previous_limb.matrix, this.getAllTransformations(previous_limb.previous));
         } else {
-            return multMat(previous_limb.initialMatrix, previous_limb.matrix);
+            return multMat(previous_limb.matrix, previous_limb.initialMatrix);
         }
     }
 
