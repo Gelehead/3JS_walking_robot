@@ -36,7 +36,7 @@ export class Limb {
 
             this.walkDirection = rotateVec3(this.walkDirection, angle, axis);
 
-            this.apply_to_children(this.matrix);
+            this.apply_to_children(m0);
         } else {
             window.alert("could not rotate " + this.name + " along the " + axis + " axis, ilegal move");
         }
@@ -48,54 +48,6 @@ export class Limb {
      * @param {*} axis 
      * @param {*} papa is the father's matrix (see README.md)
      */
-    rotateArm(angle, axis, torso, farm, hand){
-        var m = idMat4();
-        var a;
-        var final_matrix;
-
-        //transformations
-        m = multMat(torso.matrix, torso.initialMatrix);
-        m = multMat(m, this.matrix);
-        a = this.get_anchor(m);
-        this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
-        this.matrix = rotateMat(this.matrix, angle, axis);
-        this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
-        
-        final_matrix = multMat(m, this.matrix);
-        
-        m = multMat(m, this.initialMatrix);
-        //application
-        this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
-        
-        farm.self.setMatrix(multMat(multMat(final_matrix, farm.matrix),farm.initialMatrix))
-        hand.self.setMatrix(multMat(multMat(final_matrix, hand.matrix),hand.initialMatrix))
-    }
-    rotateFarm(angle, axis, torso, arm, hand){
-        var m = idMat4();
-        var m1 = idMat4();
-        var m2 = idMat4();
-        var a;
-        var final_matrix;
-
-        //transformations
-        m1 = multMat(torso.matrix, torso.initialMatrix);
-        console.log(readableMat(arm.initialMatrix))
-        m2 = multMat(arm.matrix, arm.initialMatrix)
-        
-        m = multMat(m1,arm.matrix);
-        m = multMat(m, this.matrix);
-        a = this.get_anchor(m);
-        this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
-        this.matrix = rotateMat(this.matrix, angle, axis);
-        this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
-        
-        final_matrix = multMat(m, this.matrix);
-        
-        m = multMat(m, this.initialMatrix);
-        //application
-        this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
-        hand.self.setMatrix(multMat(multMat(final_matrix, hand.matrix),hand.initialMatrix))
-    }
     anchor_rotate(angle, axis, papa){ 
 
         // initialisation
@@ -111,7 +63,7 @@ export class Limb {
         a = this.get_anchor(m);
 
         this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
-        this.matrix = multMat(this.matrix, rotateMat(this.matrix, angle, axis))
+        this.matrix = rotateMat(this.matrix, angle, axis);
         this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
         
         final_matrix = multMat(m, this.matrix);
@@ -207,18 +159,6 @@ export class Limb {
     get_angles(){
         let m = this.matrix.elements;
         return [m[0], m[4], m[8]];
-    }
-
-    getFootHeight(torso, leg){
-        var m = idMat4();
-        var torsoMatrix = multMat(torso.matrix, torso.initialMatrix)
-        var legMatrix = multMat(leg.matrix, leg.initialMatrix)
-        var footMatrix = multMat(this.matrix, this.initialMatrix)
-
-        var m1 = multMat(torsoMatrix, legMatrix);
-        var m2 = multMat(leg.matrix, footMatrix)
-
-        //return this.get_anchor()[1]
     }
 }
 

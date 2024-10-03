@@ -329,9 +329,15 @@ function checkKeyboard() {
       case "Lleg":
         robot.Lleg.anchor_rotate(-0.1, "x", robot.torso);
         break
+      case "Lfleg":
+        robot.Lfleg.anchor_rotate(-0.1, "x", robot.torso)
+        break;
       case "Rleg":
         robot.Rleg.anchor_rotate(-0.1, "x", robot.torso)
         break
+      case "Rfleg":
+        robot.Rfleg.anchor_rotate(-0.1, "x", robot.torso)
+        break;
       case "":
         break
       // Add more cases
