@@ -36,7 +36,7 @@ export class Limb {
 
             this.walkDirection = rotateVec3(this.walkDirection, angle, axis);
 
-            this.apply_to_children(m0);
+            this.apply_to_children(this.matrix);
         } else {
             window.alert("could not rotate " + this.name + " along the " + axis + " axis, ilegal move");
         }
@@ -56,9 +56,9 @@ export class Limb {
         var final_matrix;
 
         //transformations
-        m = multMat(papa.matrix, papa.initialMatrix);
+        //m = multMat(papa.matrix, papa.initialMatrix);
 
-        //m = this.getAllTransformations(this.previous);
+        m = this.root_transformation();
         m = multMat(m, this.matrix);
         a = this.get_anchor(m);
 
@@ -88,13 +88,22 @@ export class Limb {
         this.apply_to_children(final_matrix);
     }
 
-    getAllTransformations(previous_limb){
-        // get previous if existing
-        if (previous_limb != null){
-            return multMat(previous_limb.matrix, this.getAllTransformations(previous_limb.previous));
-        } else {
-            return multMat(previous_limb.matrix, previous_limb.initialMatrix);
+    root_transformation(){
+        var current_limb = this.previous;
+        var m = idMat4();
+        while (true){
+            m = multMat(m, current_limb.matrix);
+            if (current_limb.previous != null)
+            {
+                current_limb = current_limb.previous;
+            } 
+            else{
+                break;
+            }
         }
+        m = multMat(m, current_limb.initialMatrix);
+
+        return m;
     }
 
     apply_to_children(matrix){

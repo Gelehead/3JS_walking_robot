@@ -157,10 +157,6 @@ class Robot {
   }
 
   initialize() {
-
-    for (let l of this.limbs){
-      console.log(l);
-    }
     // Add robot to scene
     scene.add(this.torso.self);
       scene.add(this.head.self);
