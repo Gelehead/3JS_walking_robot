@@ -42,6 +42,68 @@ export class Limb {
         }
     }
 
+    
+    rotateArm(angle, axis, torso, farm, hand){
+        var m = idMat4();
+        var a;
+        var final_matrix;
+
+        //transformations
+        m = multMat(torso.matrix, torso.initialMatrix);
+        m = multMat(m, this.matrix);
+        a = this.get_anchor(m);
+        this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
+        this.matrix = rotateMat(this.matrix, angle, axis);
+        this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
+        
+        final_matrix = multMat(m, this.matrix);
+        
+        m = multMat(m, this.initialMatrix);
+        //application
+        this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
+        
+        farm.self.setMatrix(multMat(multMat(final_matrix, farm.matrix),farm.initialMatrix))
+        hand.self.setMatrix(multMat(multMat(final_matrix, hand.matrix),hand.initialMatrix))
+    }
+    rotateFarm(angle, axis, torso, arm, hand){
+        var m = idMat4();
+        var m1 = idMat4();
+        var m2 = idMat4();
+        var a;
+        var final_matrix;
+
+        //transformations
+        m1 = multMat(torso.matrix, torso.initialMatrix);
+        console.log(readableMat(arm.initialMatrix))
+        m2 = multMat(arm.matrix, arm.initialMatrix)
+        
+        m = multMat(m1,arm.matrix);
+        m = multMat(m, this.matrix);
+        a = this.get_anchor(m);
+        this.matrix = translateMat(this.matrix, -a[0], -a[1], -a[2]);
+        this.matrix = rotateMat(this.matrix, angle, axis);
+        this.matrix = translateMat(this.matrix, a[0], a[1], a[2]);
+        
+        final_matrix = multMat(m, this.matrix);
+        
+        m = multMat(m, this.initialMatrix);
+        //application
+        this.self.setMatrix(multMat(final_matrix, this.initialMatrix));
+        hand.self.setMatrix(multMat(multMat(final_matrix, hand.matrix),hand.initialMatrix))
+    }
+
+    getFootHeight(torso, leg){
+        var m = idMat4();
+        var torsoMatrix = multMat(torso.matrix, torso.initialMatrix)
+        var legMatrix = multMat(leg.matrix, leg.initialMatrix)
+        var footMatrix = multMat(this.matrix, this.initialMatrix)
+
+        var m1 = multMat(torsoMatrix, legMatrix);
+        var m2 = multMat(leg.matrix, footMatrix)
+
+        //return this.get_anchor()[1]
+    }
+
     /**anchor parameter is a point3 vector at which post rotation matrix will be translated
      * 
      * @param {*} angle 
